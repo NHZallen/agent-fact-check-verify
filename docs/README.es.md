@@ -2,7 +2,7 @@
 
 **Selector de idioma**: [中文](../README.md) | [English](README.en.md) | **Español (actual)** | [العربية](README.ar.md)
 
-Versión: **1.0.1**  
+Versión: **1.0.2**  
 Autor: **Allen Niu**  
 Licencia: **MIT**
 
@@ -180,6 +180,17 @@ Campos recomendados por afirmación:
 ---
 
 ## 8. Reglas duras de salida al usuario
+
+### Estructura fija de respuesta (sin límite de líneas)
+
+La salida al usuario debe incluir, en este orden:
+
+1. Veredicto: verdadero / falso / incierto / predicción (sin juicio de verdad)
+2. Evento: resumen breve de lo ocurrido
+3. Razones: 1–2 causas verificables (si falta evidencia, indicarlo explícitamente)
+4. Conclusión: cierre compacto con el punto clave
+
+Nota: no hay límite fijo de líneas, pero debe mantenerse conciso. Las razones se limitan a dos.
 
 - Nunca mostrar puntuación interna.
 - Nunca exponer la lógica interna de puntuación.

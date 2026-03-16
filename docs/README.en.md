@@ -2,7 +2,7 @@
 
 **Language Switcher**: [中文](../README.md) | **English (current)** | [Español](README.es.md) | [العربية](README.ar.md)
 
-Version: **1.0.1**  
+Version: **1.0.2**  
 Author: **Allen Niu**  
 License: **MIT**
 
@@ -180,6 +180,17 @@ Per claim recommended fields:
 ---
 
 ## 8. Hard User-facing Output Rules
+
+### Fixed response skeleton (no line-count limit)
+
+User-facing output must include, in order:
+
+1. Verdict: true / false / uncertain / prediction (no truth judgment)
+2. Event: a short summary of what happened
+3. Reasons: 1–2 verifiable drivers (state insufficiency if evidence is weak)
+4. Conclusion: one compact closing statement
+
+Note: no fixed line count, but keep concise. Reasons should be capped at two.
 
 - Never show internal score.
 - Never expose internal scoring logic.

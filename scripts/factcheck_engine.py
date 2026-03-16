@@ -156,31 +156,56 @@ def score_cmd(args):
 def compose_line(x):
     claim = x.get("claim", "")
     band = x.get("band")
-    corr = x.get("correct_info", "")
     findings = x.get("findings", "")
+    event = x.get("event_summary", "") or findings or "目前可查資料顯示此議題已有公開報導。"
+    reasons = x.get("reasons", [])
+    if isinstance(reasons, str):
+        reasons = [reasons]
+    reasons = [r for r in reasons if str(r).strip()][:2]
+    reason_text = "；".join(reasons) if reasons else "目前公開資料不足以確認單一主因。"
+    conclusion = x.get("conclusion", "")
+    corr = x.get("correct_info", "")
     sources = x.get("sources", [])
     links = "、".join([f"[{s.get('name','來源')}]({s.get('url','')})" for s in sources if s.get('url')])
 
-    if band == "true":
-        base = f"「{claim}」查核後屬實，{findings}" if findings else f"「{claim}」查核後屬實。"
-        if links:
-            base += f" 參考來源：{links}。"
-        return base
+    verdict_map = {
+        "true": "正確",
+        "false": "錯誤",
+        "uncertain": "存疑",
+        "prediction": "預測（不判真偽）",
+        "satire": "諷刺/虛構",
+        "opinion": "觀點陳述",
+    }
+    verdict = verdict_map.get(band, "存疑")
+
     if band == "false":
-        base = f"「{claim}」與可得資料不符，{corr or findings or '已找到更可信的相反證據'}。"
-        if links:
-            base += f" 參考來源：{links}。"
-        return base
-    if band == "prediction":
-        base = f"「{claim}」屬於預測性說法，目前無法證實或證偽，以下整理目前可查詢到的預測資訊：{findings or '尚無足夠一致資料'}。"
-        if links:
-            base += f" 參考來源：{links}。"
-        return base
-    if band == "satire":
-        return f"「{claim}」來源屬於諷刺/虛構內容，不應視為真實新聞。"
-    if band == "opinion":
-        return f"「{claim}」屬於觀點陳述，無法以事實查核方式做真偽判定。"
-    return f"「{claim}」目前資訊不足，暫無法確認。"
+        if not conclusion:
+            conclusion = corr or "綜合目前可得來源，此說法與主要證據不一致。"
+    elif band == "true":
+        if not conclusion:
+            conclusion = "綜合目前可得來源，此說法方向正確。"
+    elif band == "prediction":
+        if not conclusion:
+            conclusion = "此屬預測資訊，僅能整理現有來源觀點，無法做真偽判定。"
+    elif band == "satire":
+        if not conclusion:
+            conclusion = "來源屬於諷刺內容，不應作為事實新聞引用。"
+    elif band == "opinion":
+        if not conclusion:
+            conclusion = "此為觀點陳述，不屬於可直接判真偽的事實命題。"
+    else:
+        if not conclusion:
+            conclusion = "目前證據量不足，暫無法做更高信心判定。"
+
+    base = (
+        f"判定：{verdict}。\n"
+        f"事件：{event}\n"
+        f"原因：{reason_text}\n"
+        f"結論：{conclusion}"
+    )
+    if links:
+        base += f"\n來源：{links}"
+    return base
 
 
 def compose_cmd(args):
