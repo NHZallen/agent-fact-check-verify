@@ -2,7 +2,7 @@
 
 **Language Switcher**: [中文](../README.md) | **English (current)** | [Español](README.es.md) | [العربية](README.ar.md)
 
-Version: **1.0.1**  
+Version: **1.0.4**  
 Author: **Allen Niu**  
 License: **MIT**
 
@@ -181,12 +181,16 @@ Per claim recommended fields:
 
 ## 8. Hard User-facing Output Rules
 
+Always output an integrated final response and **never expose claim-by-claim details**. Use this fixed 4-part structure:
+
+1. **Correctness (short answer)**: exactly one of `correct | incorrect | partially correct | insufficient evidence`, plus one sentence.
+2. **Actual situation**: integrated explanation of what is currently true.
+3. **Conclusion**: final actionable judgment with uncertainty note when needed.
+4. **Related links (max 3)**: up to 3 links, prioritize official/high-trust sources.
+
+Also:
 - Never show internal score.
 - Never expose internal scoring logic.
-- Do not split into “supplement” and “correct info” sections; keep one integrated narrative.
-- Avoid bullets unless necessary.
-- Use clickable hyperlinks for references.
-- Present in this order: false → uncertain → true.
 - Always append:
 
 `⚠️ This verification is based on publicly available information and cannot cover private or paywalled materials.`

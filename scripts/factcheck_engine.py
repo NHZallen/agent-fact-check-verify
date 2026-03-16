@@ -153,34 +153,49 @@ def score_cmd(args):
     print(json.dumps(scored, ensure_ascii=False, indent=2))
 
 
-def compose_line(x):
-    claim = x.get("claim", "")
-    band = x.get("band")
-    corr = x.get("correct_info", "")
-    findings = x.get("findings", "")
-    sources = x.get("sources", [])
-    links = "、".join([f"[{s.get('name','來源')}]({s.get('url','')})" for s in sources if s.get('url')])
+def _summarize_verdict(arr):
+    bands = [x.get("band", "uncertain") for x in arr]
+    hard_bands = [b for b in bands if b not in ("prediction", "opinion", "satire")]
 
-    if band == "true":
-        base = f"「{claim}」查核後屬實，{findings}" if findings else f"「{claim}」查核後屬實。"
-        if links:
-            base += f" 參考來源：{links}。"
-        return base
-    if band == "false":
-        base = f"「{claim}」與可得資料不符，{corr or findings or '已找到更可信的相反證據'}。"
-        if links:
-            base += f" 參考來源：{links}。"
-        return base
-    if band == "prediction":
-        base = f"「{claim}」屬於預測性說法，目前無法證實或證偽，以下整理目前可查詢到的預測資訊：{findings or '尚無足夠一致資料'}。"
-        if links:
-            base += f" 參考來源：{links}。"
-        return base
-    if band == "satire":
-        return f"「{claim}」來源屬於諷刺/虛構內容，不應視為真實新聞。"
-    if band == "opinion":
-        return f"「{claim}」屬於觀點陳述，無法以事實查核方式做真偽判定。"
-    return f"「{claim}」目前資訊不足，暫無法確認。"
+    if not hard_bands:
+        return "證據不足", "目前主要是觀點/預測/諷刺類內容，無法做嚴格真偽判定。"
+
+    has_false = "false" in hard_bands
+    has_true = "true" in hard_bands
+
+    if has_false and has_true:
+        return "部分正確", "部分內容與事實一致，但也有關鍵內容與可得證據不符。"
+    if has_false:
+        return "錯誤", "關鍵陳述與目前可得的高可信來源不一致。"
+    if all(b == "true" for b in hard_bands):
+        return "正確", "核心陳述與目前可得證據一致。"
+    return "證據不足", "目前證據仍不足以完成明確定性。"
+
+
+def _aggregate_situation(arr):
+    chunks = []
+    for x in arr:
+        txt = (x.get("correct_info") or x.get("findings") or "").strip()
+        if txt and txt not in chunks:
+            chunks.append(txt)
+    if not chunks:
+        return "目前可得公開資訊有限，尚缺足夠一致的一手或高可信交叉證據。"
+    return "；".join(chunks[:3])
+
+
+def _collect_links(arr, max_links=3):
+    links = []
+    seen = set()
+    for x in arr:
+        for s in x.get("sources", []) or []:
+            url = (s.get("url") or "").strip()
+            if not url or url in seen:
+                continue
+            seen.add(url)
+            links.append((s.get("name") or "來源", url))
+            if len(links) >= max_links:
+                return links
+    return links
 
 
 def compose_cmd(args):
@@ -188,11 +203,36 @@ def compose_cmd(args):
     if isinstance(arr, dict):
         arr = [arr]
 
-    order = {"false": 0, "uncertain": 1, "true": 2, "prediction": 3, "satire": 4, "opinion": 5}
-    arr.sort(key=lambda x: order.get(x.get("band", "uncertain"), 9))
+    verdict, short_answer = _summarize_verdict(arr)
+    situation = _aggregate_situation(arr)
+    links = _collect_links(arr, max_links=3)
 
-    text = "\n\n".join(compose_line(x) for x in arr)
-    text = text.strip() + "\n\n" + LIMITATION
+    lines = [
+        f"是否正確（簡答）：{verdict}。{short_answer}",
+        f"此事的真實情形：{situation}",
+    ]
+
+    if verdict == "正確":
+        conclusion = "現階段可視為已被證實，但仍建議關注後續更新。"
+    elif verdict == "錯誤":
+        conclusion = "現階段可視為不正確，建議以高可信來源的最新資訊為準。"
+    elif verdict == "部分正確":
+        conclusion = "現階段應視為混合訊息，引用時需明確區分正確與錯誤部分。"
+    else:
+        conclusion = "現階段不宜下定論，建議等待更多可驗證來源。"
+
+    lines.append(f"結論：{conclusion}")
+
+    if links:
+        link_text = "\n".join([f"- {name}：{url}" for name, url in links])
+    else:
+        link_text = "- （暫無可公開附上的有效連結）"
+    lines.append("相關連結（最多三個）：\n" + link_text)
+
+    lines.append("")
+    lines.append(LIMITATION)
+
+    text = "\n\n".join(lines).strip() + "\n"
     Path(args.output).write_text(text, encoding='utf-8')
     print(text)
 

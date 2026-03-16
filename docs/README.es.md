@@ -2,7 +2,7 @@
 
 **Selector de idioma**: [中文](../README.md) | [English](README.en.md) | **Español (actual)** | [العربية](README.ar.md)
 
-Versión: **1.0.1**  
+Versión: **1.0.4**  
 Autor: **Allen Niu**  
 Licencia: **MIT**
 
@@ -181,12 +181,16 @@ Campos recomendados por afirmación:
 
 ## 8. Reglas duras de salida al usuario
 
+La salida al usuario debe ser integrada y **no debe mostrar detalle claim por claim**. Usar siempre esta estructura de 4 partes:
+
+1. **¿Es correcto? (respuesta corta)**: exactamente uno de `correcto | incorrecto | parcialmente correcto | evidencia insuficiente`, más una frase breve.
+2. **Situación real**: explicación integrada del estado real del tema.
+3. **Conclusión**: juicio final accionable, con nota de incertidumbre si aplica.
+4. **Enlaces relacionados (máx. 3)**: hasta 3 enlaces, priorizando fuentes oficiales/de alta confianza.
+
+Además:
 - Nunca mostrar puntuación interna.
 - Nunca exponer la lógica interna de puntuación.
-- No separar en bloques de “suplemento” y “información correcta”; integrar en una narrativa única.
-- Evitar viñetas salvo necesidad.
-- Usar hipervínculos clicables para fuentes.
-- Orden de presentación: falso → incierto → verdadero.
 - Añadir siempre:
 
 `⚠️ Esta verificación se basa en información públicamente disponible y no puede cubrir materiales privados o de pago.`
