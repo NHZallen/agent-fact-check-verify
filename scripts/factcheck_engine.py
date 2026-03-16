@@ -73,6 +73,9 @@ def score_one(item):
     rebuttal_authority = bool(e.get("authority_rebuttal", False))
     stale = bool(e.get("outdated_presented_current", False))
     source_chain = int(e.get("source_chain_hops", 2))
+    twitter_search_count = int(e.get("twitter_search_count", 0))
+    twitter_verified_hits = int(e.get("twitter_verified_hits", 0))
+    twitter_consensus = bool(e.get("twitter_consensus", False))
 
     # A source quality 20
     a = 0
@@ -101,6 +104,16 @@ def score_one(item):
     else:
         d += 2
     d += 7 if not e.get("strong_social_debunk", False) else 1
+
+    # Slightly increase Twitter weight (internal only), without changing other source budgets.
+    # Recommended workflow runs 3 X searches and rewards only when verified/accountable posts converge.
+    tw_bonus = 0
+    if twitter_search_count >= 3 and twitter_verified_hits >= 2 and twitter_consensus:
+        tw_bonus = 2
+    elif twitter_search_count >= 2 and twitter_verified_hits >= 1 and twitter_consensus:
+        tw_bonus = 1
+    d += tw_bonus
+
     d = min(20, d)
 
     # E context 15

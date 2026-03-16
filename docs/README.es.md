@@ -24,6 +24,10 @@ Esta habilidad está construida para flujos auditables y reproducibles, no para 
 
 ## 2. Alcance (qué hace / qué no hace)
 
+### Frases de activación (recomendado)
+
+Si el usuario escribe “verificar”, “fact-check”, “¿es cierto?”, “核實” o “核實這個”, esta skill debe activarse primero.
+
 ### 2.1 Incluye
 
 1. Extracción de afirmaciones desde texto largo.
@@ -131,7 +135,7 @@ python3 scripts/factcheck_engine.py extract \
 2. **Corroboración independiente en medios principales**.
 3. **Búsqueda de contraevidencia/desmentidos**.
 
-Límite recomendado: 6 búsquedas por afirmación.
+Límite recomendado: 6 búsquedas por afirmación. Además, se pueden ejecutar múltiples verificaciones en X(Twitter) (recomendado: 3 rondas) como corroboración social, sin cambiar los conteos de búsquedas oficiales/mainstream/contraevidencia.
 
 ### Paso C: Decisión interna
 

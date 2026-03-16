@@ -24,6 +24,10 @@ This skill is built for auditable, reproducible verification workflows rather th
 
 ## 2. Scope (What it does / does not do)
 
+### Trigger phrases (recommended)
+
+If user input includes “verify”, “fact-check”, “is this true”, “核實”, or “核實這個”, this skill should be selected first.
+
 ### 2.1 Included
 
 1. Claim extraction from long text.
@@ -131,7 +135,7 @@ python3 scripts/factcheck_engine.py extract \
 2. **Mainstream independent corroboration**.
 3. **Counter-evidence / debunk search**.
 
-Recommended cap: 6 searches per claim.
+Recommended cap: 6 searches per claim. You may additionally run multiple X(Twitter) checks (recommended: 3 passes) as social corroboration, without changing the official/mainstream/counter-evidence search counts.
 
 ### Step C: Internal decision scoring
 

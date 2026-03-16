@@ -23,3 +23,7 @@
 3. Missing evidence defaults to conservative points.
 4. Authority rebuttal has highest negative impact.
 5. Outdated-as-current and out-of-context trigger strong penalties.
+6. Twitter can contribute a **small bonus only** when multi-search corroboration is met:
+   - `twitter_search_count >= 3` and `twitter_verified_hits >= 2` and `twitter_consensus=true` => +2 (internal)
+   - `twitter_search_count >= 2` and `twitter_verified_hits >= 1` and `twitter_consensus=true` => +1 (internal)
+   - Bonus is capped within Counter-Evidence category max (20).
