@@ -1,64 +1,55 @@
 # Agent Fact Check Verify
 
+**Language Switcher**: [中文](../README.md) | **English (current)** | [Español](README.es.md) | [العربية](README.ar.md)
+
 Version: **1.0.0**  
 Author: **Allen Niu**  
 License: **MIT**
 
-This is a rigorous verification skill for AI agents. It splits input text into verifiable claims, combines official sources, mainstream media, fact-check websites, and social signals (X/Reddit), applies an internal rule-based 100-point model, and returns neutral integrated conclusions without exposing scoring details to end users.
+`agent-fact-check-verify` is a rigorous verification skill for AI agents. It extracts verifiable claims, performs multi-source cross-checking (official, mainstream media, fact-check organizations, and social signals), applies a deterministic internal scoring policy, and produces neutral integrated user responses without exposing internal scoring details.
 
-## Table of Contents
+---
 
-- [1. Goal and Design Principles](#1-goal-and-design-principles)
-- [2. Scope](#2-scope)
-- [3. Non-functional Requirements](#3-non-functional-requirements)
-- [4. Project Structure](#4-project-structure)
-- [5. Installation](#5-installation)
-- [6. Optional CLI Tools and Cookie Categories](#6-optional-cli-tools-and-cookie-categories)
-- [7. Workflow](#7-workflow)
-- [8. Input and Output Formats](#8-input-and-output-formats)
-- [9. Decision Policy (No score shown to users)](#9-decision-policy-no-score-shown-to-users)
-- [10. Response Style Rules](#10-response-style-rules)
-- [11. Limitations and Risks](#11-limitations-and-risks)
-- [12. Multilingual Docs](#12-multilingual-docs)
+## 1. Design Goals and Professional Principles
 
-## 1. Goal and Design Principles
+This skill is built for auditable, reproducible verification workflows rather than “plausible sounding” summaries.
 
-This skill focuses on truth verification and evidence traceability. It does not produce emotional framing or political persuasion.
+- **Reproducible**: same evidence leads to the same decision.
+- **Traceable**: every conclusion maps back to source links.
+- **Auditable**: fixed internal rules; no arbitrary free-form scoring.
+- **Neutral phrasing**: user-facing output avoids stance-taking.
+- **Bounded cost**: per-claim search budget and stop conditions.
 
-Design principles:
+---
 
-1. **Reproducible**: same evidence input gives same decision.
-2. **Traceable**: every conclusion links back to sources.
-3. **Neutral**: user-facing wording stays neutral.
-4. **Simple externally**: no internal scoring is exposed.
-5. **Bounded cost**: fixed search budget per claim (recommended max: 6).
+## 2. Scope (What it does / does not do)
 
-## 2. Scope
+### 2.1 Included
 
-- Claim extraction from long text.
-- Claim classification: statistical / causal / attribution / event / prediction / opinion / satire.
-- Multi-source verification: official, mainstream, counter-evidence, social signals.
-- Internal scoring: deterministic 100-point system (internal only).
-- User-facing response: integrated conclusion with no score disclosure.
+1. Claim extraction from long text.
+2. Claim type classification: statistical / causal / attribution / event / prediction / opinion / satire.
+3. Three-pass verification: official-first, mainstream cross-check, counter-evidence.
+4. Internal deterministic decision banding.
+5. User-facing integrated response with no score disclosure.
 
-## 3. Non-functional Requirements
+### 2.2 Excluded
 
-- Default user-facing language is Chinese.
-- Reply order: false first, then uncertain, then true.
-- Avoid bullet points unless necessary.
-- Always append this disclaimer:
+1. No hard truth judgment for pure subjective opinions.
+2. No social-volume-as-truth behavior.
+3. No political persuasion language.
+4. No guarantee for paywalled/private/closed-source content coverage.
 
-`⚠️ This verification is based on publicly available information and cannot cover private or paywalled materials.`
+---
 
-## 4. Project Structure
+## 3. Project Structure
 
 ```text
 agent-fact-check-verify/
 ├── SKILL.md
 ├── LICENSE
-├── README.md
+├── README.md                    # Chinese default
 ├── scripts/
-│   └── factcheck_engine.py
+│   └── factcheck_engine.py      # extract / score / compose
 ├── references/
 │   ├── scoring-rubric.md
 │   └── source-policy.md
@@ -68,60 +59,65 @@ agent-fact-check-verify/
     └── README.ar.md
 ```
 
-## 5. Installation
+---
 
-### 5.1 System Requirements
+## 4. Installation and Environment Requirements
+
+### 4.1 Base Requirements
 
 - Python 3.10+
-- Agent toolchain with web search capability (Brave / Tavily / Browser)
-
-### 5.2 Permissions
-
+- Agent search capability (Brave / Tavily / Browser)
 - Read/write access to workspace
-- Ability to invoke search tools
 
-### 5.3 Basic Validation
+### 4.2 Quick Health Check
 
 ```bash
 python3 scripts/factcheck_engine.py --help
 ```
 
-## 6. Optional CLI Tools and Cookie Categories
+If `extract|score|compose` are shown, the runtime is ready.
 
-These two CLIs are **optional**, not mandatory. If unavailable, fallback to normal web search.
+---
 
-- X search: <https://github.com/jackwener/twitter-cli>
-- Reddit search: <https://github.com/jackwener/rdt-cli>
+## 5. Optional CLI Tools and Cookie Categories (Important)
 
-### 6.1 Common cookie categories for twitter-cli
+These CLIs are **optional**. Main flow still works without them.
 
-Actual fields depend on CLI version. Common categories:
+- X CLI: <https://github.com/jackwener/twitter-cli>
+- Reddit CLI: <https://github.com/jackwener/rdt-cli>
 
-- Required: `auth_token`, `ct0`
-- Common helper: `guest_id`, `kdt`
-- Possibly present: `twid`, `lang`
+### 5.1 twitter-cli (Cookie-based)
 
-Recommendations:
+Common cookie categories:
 
-- Store cookies only in secure local environment.
-- Never commit cookies to version control.
+- **Required auth**: `auth_token`, `ct0`
+- **Session helpers**: `guest_id`, `kdt`
+- **Optional fields**: `twid`, `lang`
 
-### 6.2 Common cookie/session categories for rdt-cli
+Operational recommendations:
 
-Actual fields depend on CLI version. Common categories:
+- Store cookie files locally with restricted permissions.
+- Never commit cookies to git.
+- Rotate cookies periodically.
 
-- Session: `reddit_session`
-- Device/tracking: `loid`, `session_tracker`
-- Other possible fields: `token_v2` or equivalent auth cookie
+### 5.2 rdt-cli (Cookie-based)
 
-Recommendations:
+Common cookie/session categories:
 
-- Prefer official OAuth flow if supported.
-- If cookie login is required, use least-privilege account and rotate regularly.
+- **Primary session**: `reddit_session`
+- **Device/tracking**: `loid`, `session_tracker`
+- **Optional auth fields**: `token_v2` (tool-version dependent)
 
-## 7. Workflow
+Operational recommendations:
 
-### 7.1 Extract claims
+- Use a least-privilege account for verification workflows.
+- Refresh expired cookies and avoid plaintext storage in shared systems.
+
+---
+
+## 6. Recommended Execution Flow
+
+### Step A: Extract claims
 
 ```bash
 python3 scripts/factcheck_engine.py extract \
@@ -129,17 +125,15 @@ python3 scripts/factcheck_engine.py extract \
   --output claims.json
 ```
 
-### 7.2 External verification (agent-run)
+### Step B: Three-pass verification (agent side)
 
-Recommended three rounds:
+1. **Official/primary evidence first**.
+2. **Mainstream independent corroboration**.
+3. **Counter-evidence / debunk search**.
 
-1. Official and primary sources
-2. Mainstream cross-check
-3. Counter-evidence and debunking
+Recommended cap: 6 searches per claim.
 
-Then assemble evidence JSON and run scoring.
-
-### 7.3 Internal scoring
+### Step C: Internal decision scoring
 
 ```bash
 python3 scripts/factcheck_engine.py score \
@@ -147,7 +141,7 @@ python3 scripts/factcheck_engine.py score \
   --output scored.json
 ```
 
-### 7.4 Compose user response
+### Step D: Compose user response
 
 ```bash
 python3 scripts/factcheck_engine.py compose \
@@ -155,11 +149,11 @@ python3 scripts/factcheck_engine.py compose \
   --output reply.txt
 ```
 
-## 8. Input and Output Formats
+---
 
-### 8.1 Score input (evidence.json)
+## 7. evidence.json Field Contract (Detailed)
 
-Each claim can include:
+Per claim recommended fields:
 
 - `claim`
 - `type`
@@ -179,37 +173,42 @@ Each claim can include:
 - `evidence.missing_data_citation`
 - `evidence.fact_opinion_mixed`
 
-### 8.2 Compose input (scored.json)
+---
 
-- `band` from score: `true|false|uncertain|prediction|opinion|satire`
-- `findings`, `correct_info`, `sources` can be enriched by agent
+## 8. Hard User-facing Output Rules
 
-## 9. Decision Policy (No score shown to users)
-
-- `true`: say verified true and may extend with accurate context.
-- `false`: say mismatch and directly integrate corrected information.
-- `uncertain`: say currently unverifiable.
-- `prediction`: no truth judgment; provide discoverable prediction sources.
-- `opinion`: mark as opinion statement, not fact-check target.
-- `satire`: mark as satire/fiction source.
-
-## 10. Response Style Rules
-
-- Do not show internal score.
-- Do not split into separate “supplement” or “correct info” blocks; integrate naturally.
+- Never show internal score.
+- Never expose internal scoring logic.
+- Do not split into “supplement” and “correct info” sections; keep one integrated narrative.
 - Avoid bullets unless necessary.
-- Show false results first, then uncertain, then true.
-- Use clickable hyperlinks for sources.
+- Use clickable hyperlinks for references.
+- Present in this order: false → uncertain → true.
+- Always append:
 
-## 11. Limitations and Risks
+`⚠️ This verification is based on publicly available information and cannot cover private or paywalled materials.`
 
-- Paywalled/private materials are not visible.
-- Breaking events may change within minutes.
-- Social signals are not primary evidence.
-- Some official data may have institutional bias and require cross-validation.
+---
 
-## 12. Multilingual Docs
+## 9. Edge-case Handling
 
-- Chinese: `README.md`
-- Spanish: `docs/README.es.md`
-- Arabic: `docs/README.ar.md`
+- **Prediction**: no true/false judgment; summarize available forecast sources.
+- **Opinion**: mark as subjective and out of fact-check scope.
+- **Satire**: mark as satirical/fictional source.
+- **Insufficient evidence**: return “currently unverifiable” conservatively.
+
+---
+
+## 10. Risks and Limits
+
+1. Public information is inherently incomplete.
+2. Breaking stories can change quickly.
+3. Social platforms are auxiliary signals, not primary evidence.
+4. Institutional bias can exist even in official sources; cross-validation remains required.
+
+---
+
+## 11. Multilingual Documentation
+
+- Chinese: `../README.md`
+- Spanish: `README.es.md`
+- Arabic: `README.ar.md`
