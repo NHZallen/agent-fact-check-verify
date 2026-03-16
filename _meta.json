@@ -1,0 +1,8 @@
+{
+  "name": "agent-fact-check-verify",
+  "version": "1.0.0",
+  "author": "Allen Niu",
+  "license": "MIT",
+  "default_readme": "README.md",
+  "languages": ["zh", "en", "es", "ar"]
+}
