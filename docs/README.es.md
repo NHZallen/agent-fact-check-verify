@@ -2,7 +2,7 @@
 
 **Selector de idioma**: [中文](../README.md) | [English](README.en.md) | **Español (actual)** | [العربية](README.ar.md)
 
-Versión: **1.0.0**  
+Versión: **1.0.1**  
 Autor: **Allen Niu**  
 Licencia: **MIT**
 

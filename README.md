@@ -3,7 +3,7 @@
 **語言切換 / Language Switcher**：
 **中文（目前）** | [English](docs/README.en.md) | [Español](docs/README.es.md) | [العربية](docs/README.ar.md)
 
-版本：**1.0.0**  
+版本：**1.0.1**  
 作者：**Allen Niu**  
 授權：**MIT**
 

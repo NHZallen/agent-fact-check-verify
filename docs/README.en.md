@@ -2,7 +2,7 @@
 
 **Language Switcher**: [中文](../README.md) | **English (current)** | [Español](README.es.md) | [العربية](README.ar.md)
 
-Version: **1.0.0**  
+Version: **1.0.1**  
 Author: **Allen Niu**  
 License: **MIT**
 
