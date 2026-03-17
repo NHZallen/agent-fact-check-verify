@@ -258,3 +258,20 @@ Prioritize core claim truth over peripheral wording.
 1. Core fact layer (highest weight): whether the key event/entity/direction is true.
 2. Conditional layer (medium): time/place/target only if it changes truth value.
 3. Expression layer (low): wording such as “breaking/newsflash” should not flip verdict alone.
+
+
+
+## 14. Strictness Calibration (Reduce Overly Harsh Judgments)
+
+- Core policy: **lenient on core truth, strict on materially misleading errors**.
+- Decision order: evaluate user-facing misleading impact first, then technical detail quality.
+
+### Four-level decision
+- **correct**: core fact is true and key conditions have no material deviation.
+- **partially correct**: core fact is true but context/timeliness/wording has issues.
+- **incorrect**: core fact is false, or key-condition errors change the conclusion.
+- **insufficient evidence**: public evidence cannot support or refute the core claim.
+
+### Anti-overstrict rules
+- Non-core flaws (breaking tone, headline intensity, non-critical timestamp drift) must not alone trigger `incorrect`.
+- If core fact holds, default to `partially correct` unless key conditions truly flip the conclusion.

@@ -258,3 +258,20 @@ Priorizar la verdad del reclamo central por encima de detalles periféricos.
 1. Capa central (máximo peso): evento/entidad/dirección principal.
 2. Capa condicional (peso medio): tiempo/lugar/objeto solo si cambia la verdad.
 3. Capa de expresión (peso bajo): tono como “última hora” no debe cambiar el veredicto por sí solo.
+
+
+
+## 14. Calibración de severidad (evitar veredictos excesivamente duros)
+
+- Política central: **tolerante con el hecho núcleo, estricta con el error realmente engañoso**.
+- Orden de decisión: primero el impacto de desinformación para el usuario, luego la perfección técnica.
+
+### Decisión en cuatro niveles
+- **correcto**: el hecho central es verdadero y no hay desvíos materiales en condiciones clave.
+- **parcialmente correcto**: el hecho central es verdadero pero hay fallas de contexto/tiempo/redacción.
+- **incorrecto**: el hecho central es falso, o errores en condiciones clave cambian la conclusión.
+- **evidencia insuficiente**: la evidencia pública no permite confirmar ni refutar el núcleo.
+
+### Reglas anti-severidad excesiva
+- Fallas no nucleares (tono de “última hora”, intensidad del titular, desfase temporal no crítico) no deben por sí solas activar `incorrecto`.
+- Si el núcleo es verdadero, usar por defecto `parcialmente correcto`, salvo que condiciones clave inviertan la conclusión.
