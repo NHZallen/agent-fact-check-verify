@@ -186,7 +186,7 @@ La salida al usuario debe ser integrada y **no debe mostrar detalle claim por cl
 1. **¿Es correcto? (respuesta corta)**: exactamente uno de `correcto | incorrecto | parcialmente correcto | evidencia insuficiente`, más una frase breve.
 2. **Situación real**: explicación integrada del estado real del tema.
 3. **Conclusión**: juicio final accionable, con nota de incertidumbre si aplica.
-4. **Enlaces relacionados (máx. 3)**: hasta 3 enlaces, priorizando fuentes oficiales/de alta confianza.
+4. **Enlaces relacionados (máx. 5)**: hasta 5 enlaces, priorizados como oficial/primario > medios principales confiables > corroboración suplementaria.
 
 Además:
 - Nunca mostrar puntuación interna.
@@ -275,3 +275,20 @@ Priorizar la verdad del reclamo central por encima de detalles periféricos.
 ### Reglas anti-severidad excesiva
 - Fallas no nucleares (tono de “última hora”, intensidad del titular, desfase temporal no crítico) no deben por sí solas activar `incorrecto`.
 - Si el núcleo es verdadero, usar por defecto `parcialmente correcto`, salvo que condiciones clave inviertan la conclusión.
+
+
+
+## 15. Puntuación, revisión y política de flexibilidad (ajuste continuo)
+
+- Añadir capa de riesgo de desinformación: alto / medio / bajo.
+- Priorizar `parcialmente correcto` salvo que falle el núcleo o que el error en condiciones clave cambie decisiones del usuario.
+
+### Revisión de reversión
+- Si `incorrecto` se debe sobre todo al tono de “última hora”, intensidad del titular o desfase temporal no crítico, ejecutar segunda revisión.
+- Si no cambia la conclusión/acción, bajar a `parcialmente correcto`.
+
+### Lista no flexible (mantener estricto)
+- Seguridad pública
+- Riesgo médico y recomendaciones de salud
+- Finanzas/fraude
+- Fecha de vigencia y aplicabilidad de políticas/regulaciones oficiales

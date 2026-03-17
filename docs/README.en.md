@@ -186,7 +186,7 @@ Always output an integrated final response and **never expose claim-by-claim det
 1. **Correctness (short answer)**: exactly one of `correct | incorrect | partially correct | insufficient evidence`, plus one sentence.
 2. **Actual situation**: integrated explanation of what is currently true.
 3. **Conclusion**: final actionable judgment with uncertainty note when needed.
-4. **Related links (max 3)**: up to 3 links, prioritize official/high-trust sources.
+4. **Related links (max 5)**: up to 5 links, prioritized as official/primary > high-trust mainstream > supplemental corroboration.
 
 Also:
 - Never show internal score.
@@ -275,3 +275,20 @@ Prioritize core claim truth over peripheral wording.
 ### Anti-overstrict rules
 - Non-core flaws (breaking tone, headline intensity, non-critical timestamp drift) must not alone trigger `incorrect`.
 - If core fact holds, default to `partially correct` unless key conditions truly flip the conclusion.
+
+
+
+## 15. Scoring, Review, and Leniency Policy (Continuous Tuning)
+
+- Add a misleading-risk layer: high / medium / low.
+- Default toward `partially correct` unless core truth fails or key-condition errors change user decisions.
+
+### Reversal Check
+- If `incorrect` is driven mainly by breaking tone, headline intensity, or non-critical timestamp drift, run a second check.
+- If it does not change the conclusion/action, downgrade to `partially correct`.
+
+### Non-lenient list (stay strict)
+- Public safety
+- Medical risk and health guidance
+- Financial/fraud claims
+- Effective time/applicability of official policy/regulation
