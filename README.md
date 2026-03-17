@@ -3,7 +3,7 @@
 **語言切換 / Language Switcher**：
 **中文（目前）** | [English](docs/README.en.md) | [Español](docs/README.es.md) | [العربية](docs/README.ar.md)
 
-版本：**1.0.4**  
+版本：**1.0.5**  
 作者：**Allen Niu**  
 授權：**MIT**
 
@@ -223,3 +223,41 @@ python3 scripts/factcheck_engine.py compose \
 - English: `docs/README.en.md`
 - Español: `docs/README.es.md`
 - العربية: `docs/README.ar.md`
+
+
+
+## 12. 搜尋優先與 Fallback（v1.0.5）
+
+- 強制 Tavily 優先：有 `TAVILY_API_KEY` 且可用時，先用 Tavily。
+- 僅在 key 缺失、401/403、429/額度不足、連續 timeout 時，才退回預設搜尋。
+- fallback 不中斷流程，需註記該輪為 fallback。
+
+### 來源配比
+- Tavily/一般搜尋：50%
+- Reddit CLI：10%
+- Twitter CLI：40%
+
+### CLI 不可用時重分配
+- 無 Reddit：+7% 給 Tavily、+3% 給可信度交叉驗證。
+- 無 Twitter：+28% 給 Tavily、+12% 給可信度交叉驗證。
+- Reddit 與 Twitter 都無：Tavily 85% + 可信度交叉驗證 15%。
+
+### 搜尋次數提升
+- CLI 皆可用：10 次
+- 缺 1 個 CLI：12 次
+- 缺 2 個 CLI：14 次
+
+### 最低呼叫次數（10 次基準）
+- Tavily：至少 5 次
+- Twitter CLI：至少 4 次
+- Reddit CLI：至少 1 次
+
+> 規則：最低次數是強制門檻，不得只象徵性各呼叫 1 次。若 CLI 不可用，其最低次數需依既有重分配規則轉為 Tavily 與可信度交叉驗證追加查詢。
+
+## 13. Claim Core First（避免誤判）
+
+核實時先判斷「核心主張」再判斷細節，避免把非核心描述誤當主要錯誤。
+
+- 第一層（最高）：核心事實（事件有無、對象、方向）。
+- 第二層（中）：關鍵條件（時間/地點等，僅在會改變真假時加權）。
+- 第三層（低）：表述細節（快訊語氣、措辭），原則不得單獨翻盤。

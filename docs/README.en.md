@@ -2,7 +2,7 @@
 
 **Language Switcher**: [中文](../README.md) | **English (current)** | [Español](README.es.md) | [العربية](README.ar.md)
 
-Version: **1.0.4**  
+Version: **1.0.5**  
 Author: **Allen Niu**  
 License: **MIT**
 
@@ -220,3 +220,41 @@ Also:
 - Chinese: `../README.md`
 - Spanish: `README.es.md`
 - Arabic: `README.ar.md`
+
+
+
+## 12. Search Priority and Fallback (v1.0.5)
+
+- Enforce Tavily-first search whenever `TAVILY_API_KEY` is available and Tavily is healthy.
+- Fall back to default search only on missing key, 401/403, 429/quota exhaustion, or repeated timeout/service failure.
+- Fallback must not stop verification; label those passes as fallback.
+
+### Source Mix
+- Tavily/default search: 50%
+- Reddit CLI: 10%
+- Twitter CLI: 40%
+
+### Reallocation when CLI is missing
+- No Reddit: move 10% into Tavily +7% and credibility cross-check +3%.
+- No Twitter: move 40% into Tavily +28% and credibility cross-check +12%.
+- No Reddit + No Twitter: Tavily 85% + credibility cross-check 15%.
+
+### Search Budget Boost
+- Both CLIs available: 10 searches
+- One CLI missing: 12 searches
+- Two CLIs missing: 14 searches
+
+### Minimum Calls (10-query baseline)
+- Tavily: at least 5 calls
+- Twitter CLI: at least 4 calls
+- Reddit CLI: at least 1 call
+
+> Rule: minimum calls are hard gates, not symbolic one-off usage. If a CLI is unavailable, its minimum calls must be reallocated into extra Tavily + credibility cross-check queries under the existing fallback rules.
+
+## 13. Claim Core First (Avoid Misfocus)
+
+Prioritize core claim truth over peripheral wording.
+
+1. Core fact layer (highest weight): whether the key event/entity/direction is true.
+2. Conditional layer (medium): time/place/target only if it changes truth value.
+3. Expression layer (low): wording such as “breaking/newsflash” should not flip verdict alone.

@@ -2,7 +2,7 @@
 
 **Selector de idioma**: [中文](../README.md) | [English](README.en.md) | **Español (actual)** | [العربية](README.ar.md)
 
-Versión: **1.0.4**  
+Versión: **1.0.5**  
 Autor: **Allen Niu**  
 Licencia: **MIT**
 
@@ -220,3 +220,41 @@ Además:
 - Chino: `../README.md`
 - Inglés: `README.en.md`
 - Árabe: `README.ar.md`
+
+
+
+## 12. Prioridad de búsqueda y fallback (v1.0.5)
+
+- Forzar Tavily primero cuando `TAVILY_API_KEY` exista y el servicio esté disponible.
+- Usar búsqueda por defecto solo con clave ausente, 401/403, 429/sin cuota o timeouts repetidos.
+- El fallback no debe detener el flujo; marcar esas rondas como fallback.
+
+### Mezcla de fuentes
+- Tavily/búsqueda general: 50%
+- Reddit CLI: 10%
+- Twitter CLI: 40%
+
+### Reasignación si falta CLI
+- Sin Reddit: +7% Tavily y +3% verificación cruzada de credibilidad.
+- Sin Twitter: +28% Tavily y +12% verificación cruzada de credibilidad.
+- Sin Reddit y sin Twitter: Tavily 85% + verificación cruzada 15%.
+
+### Aumento de presupuesto de búsqueda
+- Ambos CLI disponibles: 10 búsquedas
+- Falta 1 CLI: 12 búsquedas
+- Faltan 2 CLI: 14 búsquedas
+
+### Llamadas mínimas (base de 10 consultas)
+- Tavily: al menos 5 llamadas
+- Twitter CLI: al menos 4 llamadas
+- Reddit CLI: al menos 1 llamada
+
+> Regla: los mínimos son obligatorios, no uso simbólico de una sola llamada. Si un CLI no está disponible, sus mínimos deben reasignarse a consultas extra de Tavily + verificación cruzada de credibilidad según las reglas de fallback existentes.
+
+## 13. Claim Core First (evitar errores de enfoque)
+
+Priorizar la verdad del reclamo central por encima de detalles periféricos.
+
+1. Capa central (máximo peso): evento/entidad/dirección principal.
+2. Capa condicional (peso medio): tiempo/lugar/objeto solo si cambia la verdad.
+3. Capa de expresión (peso bajo): tono como “última hora” no debe cambiar el veredicto por sí solo.
